@@ -22,6 +22,7 @@
 - [Step 8: Group Chat Setup](#-step-8-group-chat-setup)
 - [Step 9: Troubleshooting](#-step-9-troubleshooting)
 - [Step 10: Telegram Commands Reference](#-step-10-telegram-commands-reference)
+- [Cloud & Deployment Options](#-cloud--deployment-options-run-without-a-pc)
 - [Advanced Tips](#-advanced-tips)
 - [Useful Links](#-useful-links)
 - [Checklist](#-checklist)
@@ -587,6 +588,316 @@ hermes profile create work
 hermes profile use work
 # This profile has its own skills, memory, and config
 ```
+
+---
+
+## ☁️ Cloud & Deployment Options (Run Without a PC)
+
+> One of Hermes Agent's superpowers: **you don't need a PC**. Run it on a cheap cloud server and talk to it from your phone via Telegram. This section covers every option — from free to enterprise — so you can pick what fits your budget and country.
+
+---
+
+### 🎯 Audience Quick Guide
+
+| Your Situation | Recommended Option | Est. Monthly Cost |
+|---|---|---|
+| 🧑‍💻 Solo developer, just testing | OpenRouter Free + local PC | **$0** |
+| 🌍 Non-US / restricted country | OpenRouter (crypto via MetaMask) + $5 VPS | **$5–$15** |
+| 💼 Professional, needs reliability | Nous Portal + Modal/Fly.io | **$10–$50** |
+| 🏢 Team / Enterprise | Enterprise OpenRouter + Dedicated VPS | **$50–$500+** |
+| 🎓 Student, limited budget | OpenRouter Free + free cloud tier (Fly.io, Railway) | **$0** |
+| 🔒 Privacy-focused | Self-host local models + VPS with no external APIs | **$10–$30** (GPU extra) |
+| 🇨🇳 China / restricted region | DeepSeek / Moonshot / MiniMax providers + local VPS | **$5–$20** |
+
+---
+
+### Architecture Overview
+
+```
+[Your Phone — Telegram App]
+        ↕   (Internet)
+[Cloud Server — Hermes Gateway]
+        ↕
+[LLM Provider — OpenRouter / Nous Portal / Anthropic / etc.]
+```
+
+Your Hermes gateway runs **24/7 on a cloud server**. You control it entirely from Telegram. No PC needed after initial setup.
+
+---
+
+### Option 1: Nous Portal (All-in-One Subscription)
+
+**Best for:** Users who want everything bundled — models + tools + support — with one login.
+
+**What is it:** Nous Portal is Nous Research's paid platform. A single subscription gives you:
+- ✅ Access to 235+ models (via OpenRouter)
+- ✅ Tool Gateway (web search, browser automation, image generation, TTS)
+- ✅ Embeddings API (25 models)
+- ✅ Priority support
+- ✅ `hermes setup --portal` — one OAuth command configures everything
+
+**Pricing:**
+- **Tool pricing (pay-per-use):**
+  - Browser automation: **$0.0011/min**
+  - Web search (Firecrawl): **$0.0005/credit**
+  - Image gen (various models): **$0.005–$1.05/image**
+  - Modal sandbox: **$0.0495/CPU-hour** + **$0.0084/GiB-hour**
+  - Audio transcription: **$0.0063/min** of audio
+- Model costs vary by model (see [portal.nousresearch.com](https://portal.nousresearch.com/) → Info tab)
+
+**How to subscribe:**
+1. Go to [portal.nousresearch.com](https://portal.nousresearch.com/)
+2. Sign up (OAuth)
+3. Add payment method
+4. Run `hermes setup --portal` to link your local Hermes
+
+**Payment methods:** Credit/debit card
+
+---
+
+### Option 2: OpenRouter (Pay-as-You-Go, Crypto-Friendly)
+
+**Best for:** Users worldwide, including countries with restricted banking — **accepts crypto**.
+
+**What is it:** OpenRouter is the universal LLM API gateway. Hermes uses it by default. You buy credits and spend them on any model.
+
+**Pricing:**
+
+| Plan | Cost | Limits |
+|---|---|---|
+| **Free** | $0 | 25+ free models, 50 requests/day |
+| **Pay-as-you-go** | 5.5% platform fee + model cost | 400+ models, unlimited requests |
+| **Enterprise** | Custom pricing | Volume discounts, SLAs, SSO |
+
+**Model cost examples (pay-as-you-go):**
+
+| Model | Input (per 1M tokens) | Output (per 1M tokens) |
+|---|---|---|
+| DeepSeek V4 | ~$0.50 | ~$2.00 |
+| Claude Sonnet 4 | ~$3.00 | ~$15.00 |
+| Gemini 2.5 Pro | ~$1.25 | ~$5.00 |
+| Llama 4 (open) | ~$0.20 | ~$0.60 |
+| GPT-4o | ~$2.50 | ~$10.00 |
+
+> Full pricing: [openrouter.ai/models](https://openrouter.ai/models) — search any model
+
+**💳 Crypto Payment (Full Details):**
+
+| Detail | Info |
+|---|---|
+| **Accepts crypto?** | ✅ Yes (Pay-as-you-go plan) |
+| **How to pay with crypto** | 1. Sign up at [openrouter.ai](https://openrouter.ai) with Google, GitHub, or **MetaMask** 2. Go to Credits → Buy Credits → select Crypto 3. Pay with USDC/USDT/ETH |
+| **Supported wallets** | MetaMask, WalletConnect, Coinbase Wallet, and any Web3 wallet |
+| **Supported networks** | Ethereum (ERC-20), Polygon, Optimism, Arbitrum, Base |
+| **Coins accepted** | USDC, USDT, ETH, DAI (and more via on-ramp) |
+| **Minimum crypto purchase** | ~$10 equivalent |
+| **MetaMask sign-up** | You can create an account **directly with MetaMask** — no email needed |
+| **Refunds** | Unused credits are refundable on request |
+
+**✅ Why this matters:**
+- Works in countries where international credit cards are blocked
+- No bank account needed — just a crypto wallet
+- Privacy-friendly (no KYC for small amounts)
+- Instant top-up from any exchange
+
+**How much will you spend?** Typical light Telegram usage (20–50 messages/day) costs **$3–$15/month** with capable models like DeepSeek or Claude Sonnet.
+
+---
+
+### Option 3: Self-Hosted VPS ($5–$20/month)
+
+**Best for:** Users who want full control, run their own server, or need a fixed monthly cost.
+
+A **VPS** (Virtual Private Server) is a cloud computer that runs 24/7. You install Hermes on it once, and it's always online.
+
+**Recommended providers (sorted by price):**
+
+| Provider | Cheapest Plan | Crypto Payment? | Notes |
+|---|---|---|---|
+| **[Hetzner](https://hetzner.com)** | €3.79/mo | ✅ Yes (via invoice/SEPA) | Best value in Europe, excellent reliability |
+| **[DigitalOcean](https://digitalocean.com)** | $4/mo | ❌ Credit card/PayPal | Simple, beginner-friendly UI |
+| **[Vultr](https://vultr.com)** | $2.50/mo | ✅ Yes (USDC/ETH/BTC) | Cheap, many locations worldwide |
+| **[Linode (Akamai)](https://linode.com)** | $5/mo | ❌ Credit card/PayPal | Good docs, stable |
+| **[BuyVM](https://buyvm.net)** | $3.50/mo | ✅ Yes (BTC, Monero, USDC) | Privacy-focused, no KYC |
+| **[HostHatch](https://hosthatch.com)** | $3/mo | ✅ Yes (BTC, USDC) | Good for Asia/Africa |
+| **[Contabo](https://contabo.com)** | €6.99/mo | ✅ Yes (crypto via CoinGate) | Lots of RAM/CPU for the price |
+
+**Minimal VPS specs for Hermes:**
+- **CPU:** 1 vCPU
+- **RAM:** 1–2 GB
+- **Storage:** 10–25 GB SSD
+- **OS:** Ubuntu 22.04 or 24.04 LTS
+
+**Setup time:** ~10 minutes (install Hermes + configure gateway)
+
+> See our separate [VPS Deployment Guide](GUIDE.md#-vps-deployment-quickstart) below.
+
+---
+
+### Option 4: Serverless Cloud (Modal / Daytona / Fly.io)
+
+**Best for:** Advanced users who want to pay only when the bot is active — nearly $0 when idle.
+
+| Platform | How It Works | Cost When Idle | Best For |
+|---|---|---|---|
+| **[Modal](https://modal.com)** | Serverless containers, wake on demand | $0 (sleeps when not in use) | Hermes + Telegram backend; Hermes has native Modal support |
+| **[Fly.io](https://fly.io)** | Global edge deployment, auto-scaling | $0 (free tier: 3 shared VMs) | Lightweight gateway hosting |
+| **[Railway](https://railway.app)** | Simple deploy from GitHub | $0 (free $5 credit/month) | Quick deployment, beginner-friendly |
+| **[Daytona](https://daytona.io)** | Dev environment as a service | Varies | Hermes has native Daytona terminal support |
+
+**Modal + Hermes specifics:**
+- `terminal.backend: modal` in config.yaml
+- Runs Hermes in Modal's serverless sandbox
+- Auto-scales to zero when idle
+- Pay only for compute seconds used
+- Typical cost: < **$5/month** for personal use
+
+**Fly.io + Telegram gateway:**
+- Deploy the gateway as a Fly.io app
+- Free tier handles personal bot traffic easily
+- No server management
+
+---
+
+### Option 5: GPU Cloud (For Running Local Models)
+
+**Best for:** Privacy-focused users who want to run open-source models instead of paying per-token APIs.
+
+| Provider | Crypto? | Min Cost | Notes |
+|---|---|---|---|
+| **[RunPod](https://runpod.io)** | ✅ Yes | $0.34/hr (RTX 4090) | Serverless GPU, pay by second |
+| **[Vast.ai](https://vast.ai)** | ✅ Yes (BTC) | $0.20/hr (RTX 3090) | Marketplace, cheap |
+| **[TensorDock](https://tensordock.com)** | ✅ Yes | $0.25/hr | Cloud + marketplace |
+| **[Massed Compute](https://massedcompute.com)** | ✅ Yes (crypto) | $0.30/hr | Consumer GPUs |
+
+With a GPU cloud, you run models like Llama 4, Hermes 4, or DeepSeek locally on the GPU. No API costs — just the GPU rental.
+
+---
+
+### 🇷🇺🇨🇳🇧🇷 International Users — Special Notes
+
+#### For Russian / CIS users:
+- **OpenRouter** works with crypto (MetaMask + USDC on any network)
+- **Vultr, BuyVM, HostHatch** accept crypto for VPS
+- **Hetzner** accepts PayPal and SEPA from Russian banks
+- Recommended models: DeepSeek, Qwen, Llama (via OpenRouter) — competitive prices
+- **RunPod** and **Vast.ai** accept crypto for GPU rental
+
+#### For China / Asia users:
+- Hermes supports **Chinese providers natively**: MiniMax, Moonshot/Kimi, Alibaba DashScope, ZhipuAI (GLM), Qwen
+- Configure via `hermes model` → select Chinese provider
+- VPS: **Alibaba Cloud**, **Tencent Cloud**, **Huawei Cloud** — local payment methods
+- No VPN needed if using Chinese providers directly
+
+#### For Brazil / Latin America:
+- OpenRouter credits via crypto (USDT on Polygon — low fees)
+- VPS: **HostHatch (Brazil location)**, **DigitalOcean (São Paulo)**
+- Contabo accepts crypto via CoinGate
+
+#### For Africa / Middle East:
+- **BuyVM** (Luxembourg) — crypto-friendly, no KYC
+- **Vultr** (Johannesburg, Tel Aviv, Dubai locations) — accepts crypto
+- OpenRouter via MetaMask — no bank card needed
+
+---
+
+### 💰 Cost Comparison Summary
+
+All prices are approximate monthly for a personal Telegram bot (50–100 messages/day).
+
+| Setup | Model Costs | Infrastructure | Tools | **Total/mo** |
+|---|---|---|---|---|
+| OpenRouter Free + PC | $0 | $0 (your PC) | $0 | **$0** |
+| OpenRouter PAYG + $5 VPS | $3–$15 | $5 | $0–$2 | **$8–$22** |
+| Nous Portal + Modal | $5–$20 | $0–$5 | Included | **$5–$25** |
+| Self-hosted GPU (RunPod) | $0 (local models) | $30–$150 (GPU) | $0 | **$30–$150** |
+| Enterprise VPS | $50–$200 | $20–$100 | $10–$50 | **$80–$350** |
+
+> **💡 Tip for most users:** OpenRouter Pay-as-you-go + $5 VPS = **~$10/month**. This is the sweet spot.
+
+---
+
+### 🖥️ VPS Deployment Quickstart
+
+```bash
+# 1. SSH into your VPS
+ssh root@your-vps-ip
+
+# 2. Install Hermes
+curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash
+
+# 3. Configure
+hermes setup --portal  # Or manually configure OpenRouter key
+
+# 4. Set up Telegram (same steps as this guide)
+hermes gateway run
+
+# 5. Keep it running 24/7 (auto-restart on reboot)
+crontab -e
+# Add line: @reboot sleep 30 && /root/.hermes/hermes-agent/venv/bin/hermes gateway run > /root/.hermes/logs/gateway.log 2>&1 &
+```
+
+> **Pro tip:** Use `tmux` or `screen` to keep the gateway running even if SSH disconnects:
+> ```bash
+> tmux new-session -d -s hermes 'hermes gateway run'
+> ```
+
+---
+
+### 🔐 Security Best Practices for Cloud Deployment
+
+| Practice | Why |
+|---|---|
+| Use a **firewall** (UFW) | Allow only SSH (22) + outbound HTTPS. No open ports needed for Telegram polling |
+| **SSH keys only** (no passwords) | Prevents brute-force attacks |
+| Regular updates | `apt update && apt upgrade -y` monthly |
+| **Don't run as root** | Create a limited user for Hermes |
+| Keep `.env` permissions strict | `chmod 600 ~/.hermes/.env` (only owner can read) |
+
+---
+
+### 📦 All Payment Methods at a Glance
+
+| Method | Works With | Best For |
+|---|---|---|
+| 💳 Credit/Debit card (Visa, MC) | Nous Portal, OpenRouter, DigitalOcean, Linode | Most users |
+| 🅿️ PayPal | OpenRouter, Hetzner, Contabo | Europe/Americas |
+| ₿ Bitcoin (BTC) | BuyVM, Vast.ai, some VPS providers | Privacy-focused users |
+| 💎 USDC / USDT | OpenRouter, Vultr, BuyVM, HostHatch, CoinGate merchants | **Crypto users worldwide** |
+| 🔷 Ethereum (ETH) | OpenRouter (via MetaMask) | General crypto |
+| 🪙 Monero (XMR) | BuyVM, some privacy VPS | Maximum privacy |
+| 💼 Bank transfer / SEPA | Hetzner, some enterprise providers | European business |
+| 🇨🇳 Alipay / WeChat Pay | Chinese VPS providers (Alibaba, Tencent) | China users |
+| 🇧🇷 Local payment (PIX, Boleto) | Some Brazilian VPS resellers | Brazil users |
+
+---
+
+### 🌐 Networks & Wallet Setup for Crypto Payments
+
+**If you're new to crypto, here's the simplest path:**
+
+```mermaid
+1. Install MetaMask (browser extension or mobile app)
+    ↓
+2. Buy USDC on an exchange (Binance, Bybit, OKX, Kraken)
+    ↓
+3. Send USDC to your MetaMask wallet on Arbitrum/Base network (low fees)
+    ↓
+4. Go to OpenRouter → Buy Credits → Pay with MetaMask
+    ↓
+5. Done! Your Hermes bot runs on crypto
+```
+
+**Recommended networks for lowest fees:**
+| Network | Fee for $50 transfer | Time |
+|---|---|---|
+| **Arbitrum** | ~$0.10 | ~1 min |
+| **Base** | ~$0.05 | ~1 min |
+| **Polygon** | ~$0.02 | ~1 min |
+| **Optimism** | ~$0.10 | ~1 min |
+| Ethereum (ERC-20) | ~$2–$10 | ~5 min |
+
+> 🔥 Use **Arbitrum, Base, or Polygon** — avoid Ethereum mainnet for small payments (fees eat your money).
 
 ---
 

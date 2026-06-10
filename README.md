@@ -61,6 +61,24 @@ The complete step-by-step guide with all details, edge cases, troubleshooting, a
 | 8 | 👥 **Group Chat** | Privacy mode, admin setup, topic threads |
 | 9 | 🔍 **Troubleshooting** | 7 common problems + fixes |
 | 10 | ⌨️ **Commands** | Full Telegram command reference |
+| — | ☁️ **Cloud & Pricing** | Run without PC, crypto payment, VPS hosting |
+
+---
+
+## ☁️ Cloud & Deployment
+
+Run Hermes 24/7 — no PC needed. Control it from your phone via Telegram.
+
+➡️ **[Full guide: Cloud options, pricing, crypto payments](GUIDE.md#-cloud--deployment-options-run-without-a-pc)**
+
+| Option | Est. Cost/mo | Crypto? |
+|---|---|---|
+| OpenRouter Free + your PC | **$0** | — |
+| OpenRouter PAYG + $5 VPS | **$8–$22** | ✅ USDC/USDT/ETH |
+| Nous Portal + Modal | **$5–$25** | ❌ (card only) |
+| Self-hosted GPU cloud | **$30–$150** | ✅ BTC/USDC |
+
+**Crypto-friendly providers:** OpenRouter (MetaMask), Vultr, BuyVM, HostHatch, RunPod, Vast.ai
 
 ---
 
