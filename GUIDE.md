@@ -907,7 +907,7 @@ crontab -e
 |---|---|
 | 📖 Hermes Official Documentation | https://hermes-agent.nousresearch.com/docs/ |
 | 🔌 Gateway Setup Guide | https://hermes-agent.nousresearch.com/docs/user-guide/messaging/ |
-| 📱 Telegram Setup (Official Docs) | https://hermes-agent.nousresearch.com/docs/user-guide/messaging/popular/telegram/ |
+| 📱 Telegram Setup (Official Docs) | https://hermes-agent.nousresearch.com/docs/user-guide/messaging/telegram/ |
 | 🤖 @BotFather (Create Bots) | https://t.me/BotFather |
 | 🆔 @userinfobot (Get User ID) | https://t.me/userinfobot |
 | 💬 Python Telegram Bot Library | https://github.com/python-telegram-bot/python-telegram-bot |

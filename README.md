@@ -95,7 +95,7 @@ Run Hermes 24/7 — no PC needed. Control it from your phone via Telegram.
 | Resource | Link |
 |---|---|
 | Hermes Docs | https://hermes-agent.nousresearch.com/docs/ |
-| Telegram Guide (Official) | https://hermes-agent.nousresearch.com/docs/user-guide/messaging/popular/telegram/ |
+| Telegram Guide (Official) | https://hermes-agent.nousresearch.com/docs/user-guide/messaging/telegram/ |
 | @BotFather | https://t.me/BotFather |
 | @userinfobot | https://t.me/userinfobot |
 
