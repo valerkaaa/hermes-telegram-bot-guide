@@ -1,98 +1,99 @@
-# 📖 Hermes Agent — Telegram Bot Setup Guide
+---
+tags: [hermes, telegram, руководство, настройка, gateway, боты]
+created: 2026-06-10
+---
 
-> **Complete step-by-step guide to connect a Telegram bot to [Hermes Agent](https://hermes-agent.nousresearch.com/) — from creating a bot on Telegram to running the Gateway 24/7.**
->
-> **Difficulty:** 🟢 Beginner-friendly
-> **Time:** ~15–20 minutes
-> **Platform:** Linux / macOS / Windows
+# 🤖 Полное руководство: Telegram бот для Hermes Agent
+
+> **Цель:** Подключить Telegram бота к Hermes Agent, чтобы общаться с AI-агентом из любого места — с телефона, планшета, другого ПК.
+> **Сложность:** 🟢 Начальная (справится любой)
+> **Время:** ~15-20 минут
 
 ---
 
-## 📋 Table of Contents
+## 📋 Что мы получим в итоге
 
-- [Overview](#-overview)
-- [Prerequisites](#-prerequisites)
-- [Step 1: Create a Bot via BotFather](#-step-1-create-a-bot-via-botfather)
-- [Step 2: Customize Your Bot (Optional)](#-step-2-customize-your-bot-optional)
-- [Step 3: Get Your Telegram User ID](#-step-3-get-your-telegram-user-id)
-- [Step 4: Configure Hermes (.env)](#-step-4-configure-hermes-env)
-- [Step 5: Install Dependencies](#-step-5-install-dependencies)
-- [Step 6: Run the Gateway](#-step-6-run-the-gateway)
-- [Step 7: Test Your Bot](#-step-7-test-your-bot)
-- [Step 8: Group Chat Setup](#-step-8-group-chat-setup)
-- [Step 9: Troubleshooting](#-step-9-troubleshooting)
-- [Step 10: Telegram Commands Reference](#-step-10-telegram-commands-reference)
-- [Cloud & Deployment Options](#-cloud--deployment-options-run-without-a-pc)
-- [Advanced Tips](#-advanced-tips)
-- [Useful Links](#-useful-links)
-- [Checklist](#-checklist)
+| Возможность | Описание |
+|-------------|----------|
+| 💬 **Текстовые сообщения** | Пишешь боту — отвечает Hermes |
+| 🎤 **Голосовые сообщения** | Отправляешь войс — бот распознаёт речь |
+| 🖼️ **Изображения** | Отправляешь фото — бот видит и анализирует |
+| 📁 **Файлы** | Отправляешь документы — бот читает |
+| 📅 **Cron-задачи** | Результаты расписаний приходят в Telegram |
+| 👥 **Групповые чаты** | Бот может работать в группе |
+| 🌐 **Кросс-платформа** | Чат в Telegram = те же возможности, что и в терминале |
 
 ---
 
-## 📖 Overview
+## 📦 Требования
 
-| Capability | Description |
-|---|---|
-| 💬 **Text messages** | Chat with Hermes from anywhere |
-| 🎤 **Voice messages** | Send voice memos — auto-transcribed |
-| 🖼️ **Images** | Send photos — Hermes analyses them |
-| 📁 **File attachments** | Send documents — Hermes reads them |
-| 📅 **Cron delivery** | Scheduled task results arrive in Telegram |
-| 👥 **Group chats** | Bot works in groups with topic support |
-| 🌐 **Cross-platform** | Same full power as the terminal CLI |
+Перед началом убедись, что:
 
-### How It Works
+- ✅ **Hermes Agent установлен** и работает (`hermes --version` показывает версию)
+- ✅ **Установлен Python** (3.10 или новее)
+- ✅ **Установлен pip** / **uv** для зависимостей
+- ✅ **Есть аккаунт в Telegram**
+
+---
+
+## 🧭 Структура руководства
 
 ```
-[Telegram App] ←→ [Hermes Gateway] ←→ [Hermes Agent (LLM)]
-                        ↕
-              [Tools & Skills & Memory]
+├── Шаг 1️⃣  — Создать бота в Telegram (@BotFather)
+├── Шаг 2️⃣  — (Опционально) Настроить внешний вид бота
+├── Шаг 3️⃣  — Узнать свой Telegram User ID
+├── Шаг 4️⃣  — Добавить токен и ID в конфиг Hermes
+├── Шаг 5️⃣  — Установить зависимости для Telegram
+├── Шаг 6️⃣  — Запустить Gateway (шлюз)
+├── Шаг 7️⃣  — Проверка: написать боту
+├── Шаг 8️⃣  — Настройка для группы
+├── Шаг 9️⃣  — Решение типичных проблем
+└── Шаг 🔟  — Полезные команды в Telegram
 ```
 
-The **Gateway** is a background process that listens for messages from Telegram (and other platforms), forwards them to the Hermes AI agent, and sends responses back.
-
 ---
 
-## 📦 Prerequisites
+## Шаг 1️⃣: Создать бота в Telegram через @BotFather
 
-- ✅ **Hermes Agent installed** and working (`hermes --version` shows a version number)
-- ✅ **Python 3.10+** with `pip` or `uv` package manager
-- ✅ **A Telegram account** (any device)
+> [!info] Что такое BotFather?
+> **@BotFather** — это официальный бот Telegram для создания и управления другими ботами. Он выдаёт токены API, которые позволяют программам (вроде Hermes) подключаться к Telegram.
 
----
+### Пошаговая инструкция
 
-## 🪜 Step 1: Create a Bot via BotFather
+**1.** Открой Telegram на любом устройстве (телефон, ПК, веб)
 
-**@BotFather** is Telegram's official bot management tool. It issues API tokens that allow programs like Hermes to connect to Telegram.
+**2.** Найди **@BotFather**:
+   - Введи в поиске: `@BotFather`
+   - Или перейди по ссылке: [t.me/BotFather](https://t.me/BotFather)
+   - Официальный BotFather имеет ✅ **синюю галочку** верификации
 
-### Instructions
-
-1. Open Telegram on any device (phone, desktop, or web)
-2. Find **@BotFather** — search for it or visit [t.me/BotFather](https://t.me/BotFather)
-   - The real BotFather has a ✅ blue verification checkmark
-3. Send the command:
+**3.** Напиши команду:
    ```
    /newbot
    ```
-4. BotFather asks for a **display name** (any name, users will see this in their chat list):
+
+**4.** BotFather попросит **название бота** (display name):
    ```
    Alright, a new bot. How are we going to call it? Please choose a name for your bot.
    ```
-   For example:
+   Введи, например:
    ```
    My Assistant Bot
    ```
-5. Then it asks for a **username** — this must end in `bot` and be globally unique:
+   > Название может быть любым, на русском или английском. Пользователи увидят его в списке чатов.
+
+**5.** Затем BotFather попросит **username** (техническое имя):
    ```
    Good. Now let's choose a username for your bot. It must end in 'bot'. Like this, for example: TetrisBot or tetris_bot.
    ```
-   For example:
+   Введи уникальное имя, обязательно заканчивающееся на `bot`:
    ```
    my_assistant_bot
    ```
-   > The username is used for the bot's link: `t.me/my_assistant_bot`
+   > Username используется в ссылках: `t.me/my_assistant_bot`
+   > Должен быть уникальным во всём Telegram. Если занято — попробуй другой вариант.
 
-6. BotFather replies with your **API token**:
+**6.** BotFather ответит:
    ```
    Done! Congratulations on your new bot. You will find it at:
    t.me/my_assistant_bot
@@ -100,454 +101,606 @@ The **Gateway** is a background process that listens for messages from Telegram 
    Use this token to access the HTTP API:
    123456789:ABCdefGHIjklMNOpqrSTUvwxYZ
    ```
+   > [!warning] ⚠️ Сохрани токен!
+   > Токен — это **пароль** от твоего бота. Никому его не показывай.
+   > - Выглядит как `число:буквы_и_цифры`
+   > - Если токен утек — немедленно сделай `/revoke` в BotFather, затем `/token` чтобы получить новый
+   > - Токен понадобится на **Шаге 4**
 
-> [!CAUTION]
-> **Keep your bot token secret!** Anyone with this token can control your bot.
-> - If it leaks, immediately use `/revoke` in BotFather, then `/token` to get a new one
-> - Store it only in your `~/.hermes/.env` file
-
-7. Open your bot at `t.me/your_bot_username` and press **START** to activate the conversation
-
----
-
-## 🎨 Step 2: Customize Your Bot (Optional)
-
-Back in @BotFather, use these commands to polish your bot's appearance:
-
-| Command | Purpose | Example Content |
-|---|---|---|
-| `/setdescription` | Bot bio (up to 512 chars) | "🤖 AI assistant for coding, research and analytics. Available 24/7." |
-| `/setabouttext` | Short profile description (120 chars) | "AI assistant — code, research, data analysis" |
-| `/setuserpic` | Avatar image (square, 512×512 px recommended) | Upload a PNG or JPEG |
-| `/setcommands` | Slash-command menu for users | See recommended set below |
-
-### Recommended Command List (`/setcommands`)
-
-```
-help — 📖 Help and command list
-new — 🆕 Start new conversation
-topic — 💬 Manage topic threads (groups)
-speed — ⚡ Fast / full response mode
-model — 🧠 Show current AI model
-status — 📊 Current session info
-```
-
-After setting commands, users see a menu when they type `/` in your bot chat.
+**7.** Сразу же открой своего бота по ссылке `t.me/твой_бот` и нажми **START** — это активирует диалог
 
 ---
 
-## 🆔 Step 3: Get Your Telegram User ID
+## Шаг 2️⃣: (Опционально) Настроить внешний вид бота
 
-> [!WARNING]
-> Without `TELEGRAM_ALLOWED_USERS` configured, the bot ignores all incoming messages. This is a security measure to prevent spam and unauthorized access.
+> [!tip] Зачем это нужно?
+> Красиво оформленный бот выглядит профессионально, понятно объясняет новым пользователям свои возможности и вызывает доверие. Особенно если планируешь делиться ботом с другими.
 
-### Method 1: @userinfobot (Easiest)
+Вернись в @BotFather и используй эти команды:
 
-1. Find [@userinfobot](https://t.me/userinfobot)
-2. Send any message
-3. Receive your info:
+### `/setdescription` — описание бота
+
+```
+/setdescription
+→ Выбери бота
+→ Введи описание (до 512 символов)
+```
+
+Пример:
+```
+🤖 Персональный AI-ассистент.
+Помогаю с:
+• Разработкой и кодом
+• Исследованиями и анализом
+• Ответами на любые вопросы
+Напиши мне — я онлайн 24/7 🚀
+```
+
+### `/setabouttext` — краткое описание (в профиле)
+
+```
+/setabouttext
+→ Выбери бота
+→ Введи текст (до 120 символов)
+```
+
+Пример:
+```
+AI-ассистент: помощь в разработке, аналитике, исследованиях. Пиши!
+```
+
+### `/setuserpic` — аватар бота
+
+```
+/setuserpic
+→ Выбери бота
+→ Отправь изображение (квадратное, 512x512 px)
+```
+
+### `/setcommands` — меню команд
+
+```
+/setcommands
+→ Выбери бота
+→ Отправь список команд
+```
+
+Рекомендую:
+```
+help — 📖 Помощь и список команд
+new — 🆕 Начать новый разговор
+topic — 💬 Управление темами (в группах)
+speed — ⚡ Режим ответа: быстрый/полный
+model — 🧠 Показать текущую модель
+status — 📊 Информация о сессии
+```
+
+> [!info] Как выглядят команды в Telegram
+> После настройки, когда пользователь вводит `/` в чате с ботом — появляется выпадающее меню с твоими командами и описаниями.
+
+---
+
+## Шаг 3️⃣: Узнать свой Telegram User ID
+
+> [!warning] Почему это нужно?
+> Бот должен отвечать **только тебе** (или списку разрешённых пользователей). Если не настроить `TELEGRAM_ALLOWED_USERS` — бот будет игнорировать все входящие сообщения. **Это защита от спама и чужих людей.**
+
+### Как получить ID
+
+**Способ 1: @userinfobot** (проще всего)
+
+1. Найди бота **@userinfobot** (или [t.me/userinfobot](https://t.me/userinfobot))
+2. Напиши ему любое сообщение
+3. Получишь ответ:
    ```
    Id: 123456789
-   First name: YourName
-   Language: en
+   First name: Имя
+   Language: ru
    ```
 
-### Method 2: @getmyid_bot
+**Способ 2: @getmyid_bot**
+1. Найди **@getmyid_bot**
+2. Напиши `/start`
+3. Он покажет твой ID
 
-1. Find **@getmyid_bot**
-2. Send `/start`
-3. The bot displays your ID
+> [!warning] ⚠️ Не перепутай!
+> - `TELEGRAM_ALLOWED_USERS` = твой **личный числовой ID** (узнаёшь через @userinfobot)
+> - НЕ ID бота
+> - НЕ username (@твой_ник)
+> - Если поставишь ID бота — бот не сможет тебе ответить (Telegram запрещает ботам писать ботам, будет ошибка `403 Forbidden`)
 
-> [!CAUTION]
-> - `TELEGRAM_ALLOWED_USERS` must be your **personal numeric user ID** (obtained via @userinfobot or @getmyid_bot)
-> - ❌ NOT the bot's own ID
-> - ❌ NOT your @username
-> - Setting the bot's ID in `ALLOWED_USERS` causes `403 Forbidden` (Telegram blocks bot-to-bot communication)
+### Несколько пользователей
 
-### Allowing Multiple Users
+Если хочешь разрешить бота для нескольких человек (например, ты + коллега):
 
-To allow several people to use your bot, list their IDs separated by commas:
-
-```
-TELEGRAM_ALLOWED_USERS=123456789,987654321,555666777
-```
-
-Each person gets their own ID from @userinfobot.
+1. Каждый узнаёт свой ID через @userinfobot
+2. В конфиге перечисляешь через запятую:
+   ```
+   TELEGRAM_ALLOWED_USERS=123456789,987654321,555666777
+   ```
 
 ---
 
-## 🔧 Step 4: Configure Hermes (.env)
+## Шаг 4️⃣: Добавить токен и ID в конфиг Hermes
 
-The `.env` file at `~/.hermes/.env` stores API keys and secrets. This is where you tell Hermes about your Telegram bot.
+Теперь нужно «познакомить» Hermes с Telegram — записать токен и твой ID в `.env` файл.
 
-> [!NOTE]
-> On Windows, `~/.hermes/` typically resolves to `C:\Users\<YourUsername>\AppData\Local\hermes\`
-> On Linux/macOS, it's `~/.hermes/` in your home directory.
+> [!info] Что такое `.env`?
+> Файл `.env` хранит секретные ключи и токены. Он находится в папке `~/.hermes/` и содержит все API-ключи для разных сервисов: OpenRouter, Anthropic, Telegram и т.д.
 
-### Option A: Terminal (Recommended)
+### Вариант А: Создать .env через терминал (рекомендую)
+
+Открой терминал и выполни эту команду (замени **СВОЁ** на реальные значения):
 
 ```bash
-cat >> ~/.hermes/.env << 'EOF'
+cat > ~/.hermes/.env << 'EOF'
+# 🤖 Hermes Agent — Environment Variables
 
 # === TELEGRAM ===
-TELEGRAM_BOT_TOKEN=***   TELEGRAM_ALLOWED_USERS=123456789
+TELEGRAM_BOT_TOKEN=123456789:ABCdefGHIjklMNOpqrSTUvwxYZ
+TELEGRAM_ALLOWED_USERS=123456789
+
+# === MODEL PROVIDER ===
+# OPENROUTER_API_KEY=sk-or-v1-...
+# ANTHROPIC_API_KEY=sk-ant-...
+# DEEPSEEK_API_KEY=sk-...
 EOF
 ```
 
-### Option B: Using a Text Editor
+> [!tip] Подсказка для Windows (git-bash)
+> Путь `~/.hermes` в git-bash обычно соответствует `C:\Users\<имя_пользователя>\AppData\Local\hermes\`
+> Если не работает — используй абсолютный путь:
+> `/c/Users/<имя_пользователя>/AppData/Local/hermes/.env`
 
-1. Navigate to your Hermes configuration directory (`~/.hermes/`)
-2. Open or create the `.env` file (no file extension!)
-3. Add these lines:
-   ```
-   TELEGRAM_BOT_TOKEN=123456>   TELEGRAM_ALLOWED_USERS=123456789
-   ```
-4. Save and close
+### Вариант Б: Создать .env через Блокнот
 
-### Option C: Interactive Setup
+Если неудобно работать в терминале:
+
+1. Открой Проводник: `C:\Users\<имя_пользователя>\AppData\Local\hermes\`
+2. Создай новый файл с именем `.env` (важно: **без расширения**, не `.env.txt`)
+3. Вставь содержимое:
+   ```
+   TELEGRAM_BOT_TOKEN=123456789:ABCdefGHIjklMNOpqrSTUvwxYZ
+   TELEGRAM_ALLOWED_USERS=123456789
+   ```
+4. Сохрани и закрой
+
+> [!warning] Если .env уже существует
+> Не удаляй старые ключи — просто допиши Telegram строки в конец файла!
+
+### Проверка
+
+Убедись, что файл создался корректно:
 
 ```bash
-hermes setup gateway
+cat ~/.hermes/.env
 ```
 
-This launches an interactive wizard that walks you through the Telegram configuration.
+Должен увидеть строки с токеном и ID.
 
-### Verification
+### Дополнительные настройки (в config.yaml)
 
-Check that the values are set correctly:
-
-```bash
-grep TELEGRAM_BOT_TOKEN ~/.hermes/.env
-grep TELEGRAM_ALLOWED_USERS ~/.hermes/.env
-```
-
-### Advanced: config.yaml Options
-
-For fine-grained control, edit `~/.hermes/config.yaml`:
+Если нужно настроить Telegram детальнее — отредактируй `~/.hermes/config.yaml`:
 
 ```yaml
 gateway:
   platforms:
     telegram:
       enabled: true
-      topics: false          # Enable topic threads in groups
-      max_message_length: 4096  # Max response length
-      parse_mode: MarkdownV2  # or HTML
+      # topics: false            # Включить темы в группах
+      # max_message_length: 4096 # Максимальная длина ответа
+      # parse_mode: MarkdownV2   # Форматирование (MarkdownV2 / HTML)
 ```
 
-The default settings work out of the box — these are optional tweaks.
+> Обычно это не требуется — стандартные настройки работают «из коробки».
 
 ---
 
-## 📦 Step 5: Install Dependencies
+## Шаг 5️⃣: Установить зависимости для Telegram
 
-Hermes uses the `python-telegram-bot` library to communicate with Telegram.
-
-### Check if Already Installed
+Hermes использует библиотеку `python-telegram-bot` для работы с Telegram. Проверим, установлена ли она:
 
 ```bash
-python -c "import telegram; print(telegram.__version__)"
-```
+# Проверка
+python -c "import telegram" 2>&1
 
-### Install or Upgrade
-
-```bash
+# Если ошибка — установка
 pip install python-telegram-bot --upgrade
-```
 
-Or using `uv` (if you prefer):
-
-```bash
+# Или через uv (если он есть)
 uv pip install python-telegram-bot --upgrade
 ```
 
-### Voice Message Support (Optional)
-
-For automatic transcription of voice messages:
-
-```bash
-pip install faster-whisper
-
-# Configure STT
-hermes config set stt.enabled true
-hermes config set stt.provider local
-```
-
-> [!TIP]
-> The `faster-whisper` model downloads automatically on first use (~150 MB for the "base" model). You only need this if you want voice message support.
+> [!tip] Дополнительные пакеты
+> Для голосовых сообщений (STT) потребуется `faster-whisper`:
+> ```bash
+> pip install faster-whisper
+> ```
+> Подробнее: `hermes config set stt.provider local`
 
 ---
 
-## 🚀 Step 6: Run the Gateway
+## Шаг 6️⃣: Запустить Gateway (шлюз)
 
-**Gateway** is the background process that connects Telegram to Hermes. It listens for incoming messages, passes them to the AI agent, and delivers responses back.
+> [!info] Что такое Gateway?
+> Gateway (шлюз) — это фоновый процесс Hermes, который слушает входящие сообщения с платформ (Telegram, Discord и т.д.), передаёт их AI-агенту и отправляет ответы обратно. Работает 24/7.
 
-### Option A: Foreground (Testing)
+### Вариант А: Ручной запуск (для проверки)
 
 ```bash
 hermes gateway run
 ```
 
-Keep this terminal window open. Press `Ctrl+C` to stop.
+Gateway запустится **в текущем окне терминала**:
+- Ты увидишь логи в реальном времени
+- Работает, пока не закроешь терминал или не нажмёшь `Ctrl+C`
+- **Идеально для первого теста**
 
-Expected output:
+Выглядит так:
 ```
-[12:00:00] INFO     Starting Gateway...
-[12:00:01] INFO     Telegram: Connected as @my_assistant_bot
-[12:00:01] INFO     Gateway is running. Press Ctrl+C to stop.
+[2026-06-10 12:00:00] INFO     Starting Gateway...
+[2026-06-10 12:00:01] INFO     Telegram: Connected as @my_assistant_bot
+[2026-06-10 12:00:01] INFO     Gateway is running. Press Ctrl+C to stop.
 ```
 
-### Option B: System Service (Permanent)
+### Вариант Б: Как служба (для постоянной работы)
+
+После проверки запусти как фоновую службу:
 
 ```bash
-# Install as a system service
+# Установить как задачу ОС (автозапуск при входе)
 hermes gateway install
 
-# Start
+# Запустить
 hermes gateway start
 
-# Check status
+# Проверить статус
 hermes gateway status
 ```
 
-Expected output:
+Должен увидеть:
 ```
 ✓ Gateway is running
 ```
 
-### Option C: Background Process (Fallback)
+### Вариант В: Если gateway install не работает (Linux/macOS)
 
-**Linux / macOS:**
 ```bash
 nohup hermes gateway run > ~/.hermes/logs/gateway.log 2>&1 &
+```
 
-# To stop later:
+Чтобы остановить потом:
+```bash
+# Найти процесс
 ps aux | grep "hermes gateway"
+
+# Убить
 kill [PID]
 ```
 
-**Windows:** Use Task Scheduler (`taskschd.msc`) to create a task that runs `hermes gateway run` at user login.
+На Windows — можно через **Планировщик заданий** добавить запуск `hermes gateway run` при входе в систему.
 
 ---
 
-## ✅ Step 7: Test Your Bot
+## Шаг 7️⃣: Проверка — написать боту
 
-### If Using Foreground Mode (Option A)
+### Если Gateway запущен вручную (Вариант А)
 
-Keep the gateway terminal open, then on your phone or desktop:
+Оставь терминал с gateway открытым, открой Telegram на телефоне или ПК:
 
-1. Open Telegram and find your bot (`@my_assistant_bot`)
-2. Send a message: `Hello!`
-3. Wait 2–10 seconds for a response
+1. Найди своего бота по username (например `@my_assistant_bot`)
+2. Напиши: `Привет!`
+3. Через 2-10 секунд должен прийти ответ
 
-### If Using Service Mode (Option B)
+### Если Gateway запущен как служба (Вариант Б)
 
-Simply open Telegram and message your bot.
+Просто открой Telegram и напиши боту.
 
-### Expected Results
+### Что ты увидишь
 
-**In Telegram:**
+**В Telegram:**
 ```
-You: Hello!
-Bot: Hello! I'm Hermes Agent, your AI assistant. How can I help you today?
-```
-
-**In the gateway terminal:**
-```
-[12:05:00] INFO     Received message from @username (123456789): "Hello!"
-[12:05:03] INFO     Sending response...
-[12:05:04] INFO     Response sent successfully
+Ты: Привет!
+Бот: Привет! Я Hermes Agent, твой AI-ассистент. Чем могу помочь?
 ```
 
-> [!NOTE]
-> 🎉 If you got a response — congratulations! Your Telegram bot is working correctly.
+**В терминале (где запущен gateway):**
+```
+[2026-06-10 12:05:00] INFO     Received message from @username (123456789): "Привет!"
+[2026-06-10 12:05:03] INFO     Sending response...
+[2026-06-10 12:05:04] INFO     Response sent successfully
+```
+
+Теперь ты можешь общаться с Hermes Agent через Telegram с телефона!
 
 ---
 
-## 👥 Step 8: Group Chat Setup
+## 🎤 Голосовые сообщения в Telegram
 
-To add your bot to groups for team collaboration:
+### Входящие голосовые (Speech-to-Text)
 
-### 1. Disable Privacy Mode (Required for Full Group Access)
+Голосовые сообщения автоматически транскрибируются в текст выбранным STT провайдером:
 
-In @BotFather:
+| Провайдер | Требует ключ | Команда |
+|-----------|--------------|---------|
+| **local** (faster-whisper) | ❌ | `hermes config set stt.provider local` |
+| **groq** | ✅ GROQ_API_KEY | `hermes config set stt.provider groq` |
+| **openai** | ✅ VOICE_TOOLS_OPENAI_KEY | `hermes config set stt.provider openai` |
+
+**Установка local STT:**
+```bash
+pip install faster-whisper
+hermes config set stt.provider local
+hermes config set stt.local.model small
 ```
-/mybots → select your bot → Bot Settings → Group Privacy → Turn off
+
+### Исходящие голосовые (Text-to-Speech)
+
+Ответы приходят как голосовые сообщения.
+
+| Провайдер | Команда |
+|-----------|---------|
+| **edge** (по умолчанию) | `hermes config set tts.provider edge` |
+| **elevenlabs** | `hermes config set tts.provider elevenlabs` |
+
+**Настройка русского голоса:**
+```bash
+hermes config set tts.edge.voice ru-RU-DmitryNeural
 ```
 
-> [!INFO]
-> By default, bots in groups only see messages that start with `/` or reply to their own messages. Disabling privacy mode lets the bot see **all** messages in any group.
-
-### 2. Add Bot to a Group
-
-Open your group → tap group name → `Add members` → enter your bot's @username.
-
-### 3. Alternative: Make Bot an Admin
-
-If you don't want to disable privacy globally, make the bot an **administrator** of the specific group. It will see all messages in that group only.
-
-### 4. Group Commands
-
-| Command | Description |
-|---|---|
-| `/topic on` | Enable per-user topic threads (each user gets their own session) |
-| `/topic off` | Disable topics (shared group chat) |
-| `/sethome` | Set this group as the delivery channel for cron job results |
+**Для больших файлов (>20 МБ):**
+Telegram Bot API ограничивает загрузку 20 МБ. Для больших файлов запустите локальный `telegram-bot-api` сервер.
 
 ---
 
-## 🔍 Step 9: Troubleshooting
+## Шаг 8️⃣: Настройка для групповых чатов
 
-### ❌ Bot Doesn't Respond
+Если хочешь добавить бота в группу (например, для командной работы):
 
-**Check 1: Is the gateway running?**
+### 1. Настрой приватность
+
+В BotFather:
+```
+/mybots → выбери бота → Bot Settings → Group Privacy → Turn off
+```
+
+> [!info] Что это даёт?
+> По умолчанию бот в группе **видит только команды** (начинающиеся с `/`) и ответы на свои сообщения.
+> Если отключить приватность — бот будет видеть **все** сообщения в группе.
+
+### 2. Добавь бота в группу
+
+Открой группу → `⋮` → `Add members` → введи username бота.
+
+### 3. (Альтернатива) Сделай бота админом
+
+Если не хочешь отключать приватность для всех групп — можно сделать бота **администратором** группы. Тогда он тоже будет видеть все сообщения.
+
+### 4. Команды для группы
+
+- `/topic on` — включить темы (каждый пользователь получает отдельную тему-сессию)
+- `/topic off` — отключить темы (общий чат)
+- `/sethome` — сделать эту группу «домашним каналом» (сюда будут приходить результаты cron-задач)
+
+---
+
+## Шаг 9️⃣: Решение типичных проблем
+
+### ❌ Бот не отвечает
+
+**Проверь 1: Gateway запущен?**
 ```bash
 hermes gateway status
 ```
-Expected: `✓ Gateway is running`
+Должен быть `✓ Gateway is running`
 
-**Check 2: Is the token correct?**
+**Проверь 2: Токен правильный?**
 ```bash
 grep TELEGRAM_BOT_TOKEN ~/.hermes/.env
 ```
-Ensure no extra spaces, quotes, or line breaks.
+Убедись, что токен точно скопирован (без лишних пробелов, кавычек)
 
-**Check 3: Is the user ID correct?**
+**Проверь 3: ID пользователя правильный?**
 ```bash
 grep TELEGRAM_ALLOWED_USERS ~/.hermes/.env
 ```
-Must be your personal numeric ID (not the bot's ID).
+Убедись, что это **твой личный ID** (узнать через @userinfobot), а не ID бота
 
-**Check 4: Gateway logs**
+**Проверь 4: Логи gateway**
 ```bash
 tail -n 50 ~/.hermes/logs/gateway.log
 ```
-Look for keywords: `Error`, `FAILED`, `403`, `ConnectionError`
+Ищи ошибки: `Error`, `FAILED`, `403`, `ConnectionError`
 
-**Check 5: Dependencies installed**
+**Проверь 5: Зависимости**
 ```bash
 python -c "import telegram; print(telegram.__version__)"
 ```
 
-### ❌ `403 Forbidden` Error
+### ❌ Ошибка `403 Forbidden`
 
-**Cause:** `TELEGRAM_ALLOWED_USERS` contains the bot's own ID. Telegram blocks bot-to-bot communication.
+Вероятные причины:
+- В `TELEGRAM_ALLOWED_USERS` указан **ID бота** — а бот не может писать боту
+- Решение: проверь ID через @userinfobot, вставь правильный
 
-**Fix:** Get your real user ID from @userinfobot and update the `.env` file. Then restart the gateway.
-
-### ❌ `ConnectionError` / Timeout
+### ❌ Ошибка `ConnectionError` / `Timeout`
 
 ```bash
-# Test network connectivity
-ping -c 1 api.telegram.org
+# Проверь интернет
+ping api.telegram.org -c 1
 
-# Test DNS resolution
+# Проверь DNS
 nslookup api.telegram.org
 ```
 
-**Firewall:** Ensure your machine can make outbound HTTPS connections to `api.telegram.org:443`.
-
-### ❌ Gateway Crashes Immediately
+### ❌ Gateway сразу падает после запуска
 
 ```bash
-# Check recent errors
+# Посмотри последние ошибки
 tail -n 100 ~/.hermes/logs/gateway.log
 
-# Reinstall dependencies
+# Попробуй переустановить зависимости
 pip install --upgrade python-telegram-bot httpx
 ```
 
-### ❌ Voice Messages Not Working
+### ❌ Не приходят голосовые сообщения
 
 ```bash
-# Install transcription engine
+# Установи faster-whisper
 pip install faster-whisper
 
-# Enable STT
+# Настрой STT
 hermes config set stt.enabled true
 hermes config set stt.provider local
 
-# Restart gateway
+# Перезапусти gateway
 hermes gateway restart
 ```
 
-### ❌ Broken Text Formatting (Emojis/Markdown)
+### ❌ Бот отвечает, но текст «битый» (эмодзи/форматирование)
 
-Add this to your `.env`:
+В `.env` добавь:
 ```bash
 echo 'TELEGRAM_PARSE_MODE=HTML' >> ~/.hermes/.env
 ```
+Или используй `MarkdownV2` вместо `HTML`.
 
-Or try `MarkdownV2` instead of `HTML` if you prefer Markdown formatting.
-
-### ❌ Service Doesn't Start at Boot
+### ❌ Gateway установлен как служба, но не стартует при входе
 
 **Windows:**
-1. Open **Task Scheduler** (`taskschd.msc`)
-2. Find the `Hermes Gateway` task
-3. Verify:
-   - Task is enabled
-   - Paths to Python and Hermes are correct
-   - Runs under your user account
-   - Trigger is set to "At logon"
+1. Открой **Планировщик заданий** (`taskschd.msc`)
+2. Найди задачу `Hermes Gateway`
+3. Проверь настройки:
+   - Включена ли задача
+   - Правильный ли путь к Python и Hermes
+   - Работает ли от текущего пользователя
 
 **Linux (systemd):**
 ```bash
-# Enable user-linger (so services run without login)
+systemctl --user status hermes-gateway
+journalctl --user -u hermes-gateway -n 30
+# Включить автозапуск через systemd:
 loginctl enable-linger $USER
-
-# Enable the service
 systemctl --user enable hermes-gateway
-
-# Check logs
-journalctl --user -u hermes-gateway -n 30 --no-pager
 ```
 
 ---
 
-## ⌨️ Step 10: Telegram Commands Reference
+## Шаг 🔟: Полезные команды в Telegram
 
-Once connected, all Hermes commands work through Telegram.
+После подключения бота, в Telegram работают все основные команды Hermes:
 
-### Core Commands
+### Основные
 
-| Command | Description |
-|---|---|
-| `/help` | Show list of available commands |
-| `/new` | Reset conversation (clear context, start fresh) |
-| `/retry` | Resend the last message to the AI |
-| `/undo` | Remove the last exchange |
-| `/title <name>` | Rename the current session |
-| `/stop` | Kill background processes |
-| `/model` | Show current AI model in use |
-| `/fast` | Toggle fast response mode |
+| Команда | Описание |
+|---------|----------|
+| `/help` | Показать список команд |
+| `/new` | Начать новый разговор (сбросить контекст) |
+| `/retry` | Переотправить последний запрос |
+| `/undo` | Отменить последний обмен |
+| `/title новое название` | Переименовать текущую сессию |
+| `/stop` | Остановить фоновые процессы |
+| `/model` | Показать текущую модель |
+| `/fast` | Переключить быстрый режим |
 
-### Gateway Commands
+### Gateway
 
-| Command | Description |
-|---|---|
-| `/sethome` | Set this chat as the delivery channel for cron results |
-| `/topic on/off` | Enable/disable per-user topic threads in groups |
-| `/platforms` | Show connected platform status |
-| `/restart` | Restart the gateway |
-| `/status` | Show current session info |
+| Команда | Описание |
+|---------|----------|
+| `/sethome` | Сделать этот чат домашним каналом |
+| `/topic on/off` | Включить/отключить темы в группах |
+| `/platforms` | Показать статус подключенных платформ |
+| `/restart` | Перезапустить gateway |
+| `/status` | Информация о сессии |
 
-### Info Commands
+### Информация
 
-| Command | Description |
-|---|---|
-| `/usage` | Token usage statistics |
-| `/profile` | Show active Hermes profile |
-| `/debug` | Generate and upload a debug report |
-| `/insights` | Usage analytics over time |
+| Команда | Описание |
+|---------|----------|
+| `/usage` | Статистика использования токенов |
+| `/profile` | Активный профиль Hermes |
+| `/debug` | Создать отчёт для отладки |
+| `/insights` | Аналитика использования |
 
 ---
 
-## 🧠 Advanced Tips
+## 🧠 Дополнительные советы
+
+### Персонализация (Personality)
+
+Можешь задать боту свой стиль общения через файл `SOUL.md`:
+
+```bash
+cat > ~/.hermes/SOUL.md << 'EOF'
+Ты — дружелюбный русскоязычный AI-ассистент.
+Говоришь кратко, по делу.
+Используешь эмодзи умеренно.
+Отвечаешь на русском языке.
+EOF
+```
+
+### Своё приветствие
+
+При запуске gateway можно настроить приветственное сообщение в конфиге:
+
+```yaml
+# ~/.hermes/config.yaml
+gateway:
+  telegram:
+    welcome_message: "🤖 Привет! Я твой AI-ассистент. Чем могу помочь?"
+```
+
+### Cron-задачи с доставкой в Telegram
+
+```bash
+# Пример: ежедневный дайджест в Telegram
+hermes cron create "0 9 * * *" \
+  --name "Утренний дайджест" \
+  --prompt "Сделай краткий дайджест последних новостей из мира AI и технологий"
+```
+
+Результат будет приходить в чат с ботом автоматически.
+
+### Несколько профилей
+
+Можно запустить разные профили Hermes для разных задач:
+
+```bash
+hermes profile create work
+hermes profile use work
+# В этом профиле — свои навыки, память, конфиг
+```
+## 📚 Полезные ссылки
+
+| Ресурс                             | Ссылка                                                                              |
+| ---------------------------------- | ----------------------------------------------------------------------------------- |
+| 📖 Официальная документация Hermes | https://hermes-agent.nousresearch.com/docs/                                         |
+| 🔗 Настройка Gateway               | https://hermes-agent.nousresearch.com/docs/user-guide/messaging/                    |
+| 📱 Telegram Setup | https://hermes-agent.nousresearch.com/docs/user-guide/messaging/telegram/ |
+| 🤖 BotFather                       | https://t.me/BotFather                                                              |
+| 🆔 @userinfobot                    | https://t.me/userinfobot                                                            |
+| 💬 Python Telegram Bot             | https://github.com/python-telegram-bot/python-telegram-bot                          |
+
+---
+
+## 🔗 Полезные ссылки
+
+|| Ресурс                             | Ссылка                                                                              |
+|| ---------------------------------- | ----------------------------------------------------------------------------------- |
+|| 📖 Официальная документация Hermes | https://hermes-agent.nousresearch.com/docs/                                         |
+|| 🔌 Настройка Gateway               | https://hermes-agent.nousresearch.com/docs/user-guide/messaging/                    |
+|| 📱 Telegram Setup (Official Docs) | https://hermes-agent.nousresearch.com/docs/user-guide/messaging/telegram/           |
+|| 🤖 BotFather                       | https://t.me/BotFather                                                              |
+|| 🆔 @userinfobot                    | https://t.me/userinfobot                                                            |
+|| 💬 Python Telegram Bot             | https://github.com/python-telegram-bot/python-telegram-bot                          |
+
+---
+
+## 🧠 Advanced Tips (перенесено из GitHub)
 
 ### Personality Customization
 
-Set your bot's communication style via the AI persona file:
+Настрой стиль общения бота через файл персонажа:
 
 ```bash
 cat > ~/.hermes/SOUL.md << 'EOF'
@@ -558,385 +711,78 @@ Respond in the user's language.
 EOF
 ```
 
-### Custom Welcome Message
+### Кастомное приветствие
 
-In `~/.hermes/config.yaml`:
+В `~/.hermes/config.yaml`:
 
 ```yaml
 gateway:
   telegram:
-    welcome_message: "🤖 Hello! I'm your AI assistant. How can I help you today?"
+    welcome_message: "🤖 Привет! Я твой AI-ассистент. Чем могу помочь?"
 ```
 
-### Cron Jobs Delivered to Telegram
+### Cron-задачи в Telegram
 
 ```bash
-# Example: receive a daily morning digest in your Telegram bot
+# Пример: ежедневный дайджест новостей в 9 утра
 hermes cron create "0 9 * * *" \
   --name "Daily Digest" \
-  --prompt "Create a brief digest of the latest news in AI and technology"
+  --prompt "Создай краткий дайджест последних новостей в AI и технологиях"
 ```
 
-Results arrive automatically in your Telegram bot chat.
+Результаты придут автоматически в чат с ботом.
 
-### Multiple Hermes Profiles
+---
 
-Run different profiles for different contexts:
+## ☁️ Cloud & Deployment Options (запуск без ПК)
+
+Hermes можно запустить на облачном сервере — и управлять им через Telegram с телефона.
+
+### 🎯 Быстрый выбор по ситуации
+
+|| Ситуация | Рекомендация | Стоимость |
+||---------|-------------|-----------|
+|| тестирую | OpenRouter Free + свой ПК | **$0** |
+|| 🌍 ограниченная страна | OpenRouter (крипто) + $5 VPS | **$5–$15** |
+|| 📚 студент | OpenRouter Free + Fly.io | **$0** |
+|| 🔒 приватность | локальные модели + VPS | **$10–$30** |
+
+### VPS Deployment Quickstart
 
 ```bash
-hermes profile create work
-hermes profile use work
-# This profile has its own skills, memory, and config
-```
-
----
-
-## ☁️ Cloud & Deployment Options (Run Without a PC)
-
-> One of Hermes Agent's superpowers: **you don't need a PC**. Run it on a cheap cloud server and talk to it from your phone via Telegram. This section covers every option — from free to enterprise — so you can pick what fits your budget and country.
-
----
-
-### 🎯 Audience Quick Guide
-
-| Your Situation | Recommended Option | Est. Monthly Cost |
-|---|---|---|
-| 🧑‍💻 Solo developer, just testing | OpenRouter Free + local PC | **$0** |
-| 🌍 Non-US / restricted country | OpenRouter (crypto via MetaMask) + $5 VPS | **$5–$15** |
-| 💼 Professional, needs reliability | Nous Portal + Modal/Fly.io | **$10–$50** |
-| 🏢 Team / Enterprise | Enterprise OpenRouter + Dedicated VPS | **$50–$500+** |
-| 🎓 Student, limited budget | OpenRouter Free + free cloud tier (Fly.io, Railway) | **$0** |
-| 🔒 Privacy-focused | Self-host local models + VPS with no external APIs | **$10–$30** (GPU extra) |
-| 🇨🇳 China / restricted region | DeepSeek / Moonshot / MiniMax providers + local VPS | **$5–$20** |
-
----
-
-### Architecture Overview
-
-```
-[Your Phone — Telegram App]
-        ↕   (Internet)
-[Cloud Server — Hermes Gateway]
-        ↕
-[LLM Provider — OpenRouter / Nous Portal / Anthropic / etc.]
-```
-
-Your Hermes gateway runs **24/7 on a cloud server**. You control it entirely from Telegram. No PC needed after initial setup.
-
----
-
-### Option 1: Nous Portal (All-in-One Subscription)
-
-**Best for:** Users who want everything bundled — models + tools + support — with one login.
-
-**What is it:** Nous Portal is Nous Research's paid platform. A single subscription gives you:
-- ✅ Access to 235+ models (via OpenRouter)
-- ✅ Tool Gateway (web search, browser automation, image generation, TTS)
-- ✅ Embeddings API (25 models)
-- ✅ Priority support
-- ✅ `hermes setup --portal` — one OAuth command configures everything
-
-**Pricing:**
-- **Tool pricing (pay-per-use):**
-  - Browser automation: **$0.0011/min**
-  - Web search (Firecrawl): **$0.0005/credit**
-  - Image gen (various models): **$0.005–$1.05/image**
-  - Modal sandbox: **$0.0495/CPU-hour** + **$0.0084/GiB-hour**
-  - Audio transcription: **$0.0063/min** of audio
-- Model costs vary by model (see [portal.nousresearch.com](https://portal.nousresearch.com/) → Info tab)
-
-**How to subscribe:**
-1. Go to [portal.nousresearch.com](https://portal.nousresearch.com/)
-2. Sign up (OAuth)
-3. Add payment method
-4. Run `hermes setup --portal` to link your local Hermes
-
-**Payment methods:** Credit/debit card
-
----
-
-### Option 2: OpenRouter (Pay-as-You-Go, Crypto-Friendly)
-
-**Best for:** Users worldwide, including countries with restricted banking — **accepts crypto**.
-
-**What is it:** OpenRouter is the universal LLM API gateway. Hermes uses it by default. You buy credits and spend them on any model.
-
-**Pricing:**
-
-| Plan | Cost | Limits |
-|---|---|---|
-| **Free** | $0 | 25+ free models, 50 requests/day |
-| **Pay-as-you-go** | 5.5% platform fee + model cost | 400+ models, unlimited requests |
-| **Enterprise** | Custom pricing | Volume discounts, SLAs, SSO |
-
-**Model cost examples (pay-as-you-go):**
-
-| Model | Input (per 1M tokens) | Output (per 1M tokens) |
-|---|---|---|
-| DeepSeek V4 | ~$0.50 | ~$2.00 |
-| Claude Sonnet 4 | ~$3.00 | ~$15.00 |
-| Gemini 2.5 Pro | ~$1.25 | ~$5.00 |
-| Llama 4 (open) | ~$0.20 | ~$0.60 |
-| GPT-4o | ~$2.50 | ~$10.00 |
-
-> Full pricing: [openrouter.ai/models](https://openrouter.ai/models) — search any model
-
-**💳 Crypto Payment (Full Details):**
-
-| Detail | Info |
-|---|---|
-| **Accepts crypto?** | ✅ Yes (Pay-as-you-go plan) |
-| **How to pay with crypto** | 1. Sign up at [openrouter.ai](https://openrouter.ai) with Google, GitHub, or **MetaMask** 2. Go to Credits → Buy Credits → select Crypto 3. Pay with USDC/USDT/ETH |
-| **Supported wallets** | MetaMask, WalletConnect, Coinbase Wallet, and any Web3 wallet |
-| **Supported networks** | Ethereum (ERC-20), Polygon, Optimism, Arbitrum, Base |
-| **Coins accepted** | USDC, USDT, ETH, DAI (and more via on-ramp) |
-| **Minimum crypto purchase** | ~$10 equivalent |
-| **MetaMask sign-up** | You can create an account **directly with MetaMask** — no email needed |
-| **Refunds** | Unused credits are refundable on request |
-
-**✅ Why this matters:**
-- Works in countries where international credit cards are blocked
-- No bank account needed — just a crypto wallet
-- Privacy-friendly (no KYC for small amounts)
-- Instant top-up from any exchange
-
-**How much will you spend?** Typical light Telegram usage (20–50 messages/day) costs **$3–$15/month** with capable models like DeepSeek or Claude Sonnet.
-
----
-
-### Option 3: Self-Hosted VPS ($5–$20/month)
-
-**Best for:** Users who want full control, run their own server, or need a fixed monthly cost.
-
-A **VPS** (Virtual Private Server) is a cloud computer that runs 24/7. You install Hermes on it once, and it's always online.
-
-**Recommended providers (sorted by price):**
-
-| Provider | Cheapest Plan | Crypto Payment? | Notes |
-|---|---|---|---|
-| **[Hetzner](https://hetzner.com)** | €3.79/mo | ✅ Yes (via invoice/SEPA) | Best value in Europe, excellent reliability |
-| **[DigitalOcean](https://digitalocean.com)** | $4/mo | ❌ Credit card/PayPal | Simple, beginner-friendly UI |
-| **[Vultr](https://vultr.com)** | $2.50/mo | ✅ Yes (USDC/ETH/BTC) | Cheap, many locations worldwide |
-| **[Linode (Akamai)](https://linode.com)** | $5/mo | ❌ Credit card/PayPal | Good docs, stable |
-| **[BuyVM](https://buyvm.net)** | $3.50/mo | ✅ Yes (BTC, Monero, USDC) | Privacy-focused, no KYC |
-| **[HostHatch](https://hosthatch.com)** | $3/mo | ✅ Yes (BTC, USDC) | Good for Asia/Africa |
-| **[Contabo](https://contabo.com)** | €6.99/mo | ✅ Yes (crypto via CoinGate) | Lots of RAM/CPU for the price |
-
-**Minimal VPS specs for Hermes:**
-- **CPU:** 1 vCPU
-- **RAM:** 1–2 GB
-- **Storage:** 10–25 GB SSD
-- **OS:** Ubuntu 22.04 or 24.04 LTS
-
-**Setup time:** ~10 minutes (install Hermes + configure gateway)
-
-> See our separate [VPS Deployment Guide](GUIDE.md#-vps-deployment-quickstart) below.
-
----
-
-### Option 4: Serverless Cloud (Modal / Daytona / Fly.io)
-
-**Best for:** Advanced users who want to pay only when the bot is active — nearly $0 when idle.
-
-| Platform | How It Works | Cost When Idle | Best For |
-|---|---|---|---|
-| **[Modal](https://modal.com)** | Serverless containers, wake on demand | $0 (sleeps when not in use) | Hermes + Telegram backend; Hermes has native Modal support |
-| **[Fly.io](https://fly.io)** | Global edge deployment, auto-scaling | $0 (free tier: 3 shared VMs) | Lightweight gateway hosting |
-| **[Railway](https://railway.app)** | Simple deploy from GitHub | $0 (free $5 credit/month) | Quick deployment, beginner-friendly |
-| **[Daytona](https://daytona.io)** | Dev environment as a service | Varies | Hermes has native Daytona terminal support |
-
-**Modal + Hermes specifics:**
-- `terminal.backend: modal` in config.yaml
-- Runs Hermes in Modal's serverless sandbox
-- Auto-scales to zero when idle
-- Pay only for compute seconds used
-- Typical cost: < **$5/month** for personal use
-
-**Fly.io + Telegram gateway:**
-- Deploy the gateway as a Fly.io app
-- Free tier handles personal bot traffic easily
-- No server management
-
----
-
-### Option 5: GPU Cloud (For Running Local Models)
-
-**Best for:** Privacy-focused users who want to run open-source models instead of paying per-token APIs.
-
-| Provider | Crypto? | Min Cost | Notes |
-|---|---|---|---|
-| **[RunPod](https://runpod.io)** | ✅ Yes | $0.34/hr (RTX 4090) | Serverless GPU, pay by second |
-| **[Vast.ai](https://vast.ai)** | ✅ Yes (BTC) | $0.20/hr (RTX 3090) | Marketplace, cheap |
-| **[TensorDock](https://tensordock.com)** | ✅ Yes | $0.25/hr | Cloud + marketplace |
-| **[Massed Compute](https://massedcompute.com)** | ✅ Yes (crypto) | $0.30/hr | Consumer GPUs |
-
-With a GPU cloud, you run models like Llama 4, Hermes 4, or DeepSeek locally on the GPU. No API costs — just the GPU rental.
-
----
-
-### 🇷🇺🇨🇳🇧🇷 International Users — Special Notes
-
-#### For Russian / CIS users:
-- **OpenRouter** works with crypto (MetaMask + USDC on any network)
-- **Vultr, BuyVM, HostHatch** accept crypto for VPS
-- **Hetzner** accepts PayPal and SEPA from Russian banks
-- Recommended models: DeepSeek, Qwen, Llama (via OpenRouter) — competitive prices
-- **RunPod** and **Vast.ai** accept crypto for GPU rental
-
-#### For China / Asia users:
-- Hermes supports **Chinese providers natively**: MiniMax, Moonshot/Kimi, Alibaba DashScope, ZhipuAI (GLM), Qwen
-- Configure via `hermes model` → select Chinese provider
-- VPS: **Alibaba Cloud**, **Tencent Cloud**, **Huawei Cloud** — local payment methods
-- No VPN needed if using Chinese providers directly
-
-#### For Brazil / Latin America:
-- OpenRouter credits via crypto (USDT on Polygon — low fees)
-- VPS: **HostHatch (Brazil location)**, **DigitalOcean (São Paulo)**
-- Contabo accepts crypto via CoinGate
-
-#### For Africa / Middle East:
-- **BuyVM** (Luxembourg) — crypto-friendly, no KYC
-- **Vultr** (Johannesburg, Tel Aviv, Dubai locations) — accepts crypto
-- OpenRouter via MetaMask — no bank card needed
-
----
-
-### 💰 Cost Comparison Summary
-
-All prices are approximate monthly for a personal Telegram bot (50–100 messages/day).
-
-| Setup | Model Costs | Infrastructure | Tools | **Total/mo** |
-|---|---|---|---|---|
-| OpenRouter Free + PC | $0 | $0 (your PC) | $0 | **$0** |
-| OpenRouter PAYG + $5 VPS | $3–$15 | $5 | $0–$2 | **$8–$22** |
-| Nous Portal + Modal | $5–$20 | $0–$5 | Included | **$5–$25** |
-| Self-hosted GPU (RunPod) | $0 (local models) | $30–$150 (GPU) | $0 | **$30–$150** |
-| Enterprise VPS | $50–$200 | $20–$100 | $10–$50 | **$80–$350** |
-
-> **💡 Tip for most users:** OpenRouter Pay-as-you-go + $5 VPS = **~$10/month**. This is the sweet spot.
-
----
-
-### 🖥️ VPS Deployment Quickstart
-
-```bash
-# 1. SSH into your VPS
+# 1. Подключись к VPS
 ssh root@your-vps-ip
 
-# 2. Install Hermes
+# 2. Установи Hermes
 curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash
 
-# 3. Configure
-hermes setup --portal  # Or manually configure OpenRouter key
-
-# 4. Set up Telegram (same steps as this guide)
+# 3. Настрой Telegram
 hermes gateway run
 
-# 5. Keep it running 24/7 (auto-restart on reboot)
+# 4. Запуск при старте системы
 crontab -e
-# Add line: @reboot sleep 30 && /root/.hermes/hermes-agent/venv/bin/hermes gateway run > /root/.hermes/logs/gateway.log 2>&1 &
+# Добавь: @reboot sleep 30 && /root/.hermes/hermes-agent/venv/bin/hermes gateway run
 ```
 
-> **Pro tip:** Use `tmux` or `screen` to keep the gateway running even if SSH disconnects:
-> ```bash
-> tmux new-session -d -s hermes 'hermes gateway run'
-> ```
+### 💳 Крипто-оплата
+
+OpenRouter принимает **USDC/USDT** через MetaMask — работает в любой стране.
 
 ---
 
-### 🔐 Security Best Practices for Cloud Deployment
+## 📝 Чек-лист для быстрого старта
 
-| Practice | Why |
-|---|---|
-| Use a **firewall** (UFW) | Allow only SSH (22) + outbound HTTPS. No open ports needed for Telegram polling |
-| **SSH keys only** (no passwords) | Prevents brute-force attacks |
-| Regular updates | `apt update && apt upgrade -y` monthly |
-| **Don't run as root** | Create a limited user for Hermes |
-| Keep `.env` permissions strict | `chmod 600 ~/.hermes/.env` (only owner can read) |
-
----
-
-### 📦 All Payment Methods at a Glance
-
-| Method | Works With | Best For |
-|---|---|---|
-| 💳 Credit/Debit card (Visa, MC) | Nous Portal, OpenRouter, DigitalOcean, Linode | Most users |
-| 🅿️ PayPal | OpenRouter, Hetzner, Contabo | Europe/Americas |
-| ₿ Bitcoin (BTC) | BuyVM, Vast.ai, some VPS providers | Privacy-focused users |
-| 💎 USDC / USDT | OpenRouter, Vultr, BuyVM, HostHatch, CoinGate merchants | **Crypto users worldwide** |
-| 🔷 Ethereum (ETH) | OpenRouter (via MetaMask) | General crypto |
-| 🪙 Monero (XMR) | BuyVM, some privacy VPS | Maximum privacy |
-| 💼 Bank transfer / SEPA | Hetzner, some enterprise providers | European business |
-| 🇨🇳 Alipay / WeChat Pay | Chinese VPS providers (Alibaba, Tencent) | China users |
-| 🇧🇷 Local payment (PIX, Boleto) | Some Brazilian VPS resellers | Brazil users |
+- [ ] **Шаг 1:** Создан бот через @BotFather, токен сохранён
+- [ ] **Шаг 2:** (Опционально) Описание, аватар, команды настроены
+- [ ] **Шаг 3:** Получен Telegram User ID через @userinfobot
+- [ ] **Шаг 4:** Токен и ID записаны в `~/.hermes/.env`
+- [ ] **Шаг 5:** Установлен `python-telegram-bot`
+- [ ] **Шаг 6:** Gateway запущен и работает
+- [ ] **Шаг 7:** Бот отвечает в Telegram
+- [ ] **Шаг 8:** (По желанию) Бот добавлен в группу
+- [ ] **Голосовые:** Установлен `faster-whisper`, настроен русский голос
 
 ---
 
-### 🌐 Networks & Wallet Setup for Crypto Payments
-
-**If you're new to crypto, here's the simplest path:**
-
-```mermaid
-1. Install MetaMask (browser extension or mobile app)
-    ↓
-2. Buy USDC on an exchange (Binance, Bybit, OKX, Kraken)
-    ↓
-3. Send USDC to your MetaMask wallet on Arbitrum/Base network (low fees)
-    ↓
-4. Go to OpenRouter → Buy Credits → Pay with MetaMask
-    ↓
-5. Done! Your Hermes bot runs on crypto
-```
-
-**Recommended networks for lowest fees:**
-| Network | Fee for $50 transfer | Time |
-|---|---|---|
-| **Arbitrum** | ~$0.10 | ~1 min |
-| **Base** | ~$0.05 | ~1 min |
-| **Polygon** | ~$0.02 | ~1 min |
-| **Optimism** | ~$0.10 | ~1 min |
-| Ethereum (ERC-20) | ~$2–$10 | ~5 min |
-
-> 🔥 Use **Arbitrum, Base, or Polygon** — avoid Ethereum mainnet for small payments (fees eat your money).
-
----
-
-## 🔗 Useful Links
-
-| Resource | Link |
-|---|---|
-| 📖 Hermes Official Documentation | https://hermes-agent.nousresearch.com/docs/ |
-| 🔌 Gateway Setup Guide | https://hermes-agent.nousresearch.com/docs/user-guide/messaging/ |
-| 📱 Telegram Setup (Official Docs) | https://hermes-agent.nousresearch.com/docs/user-guide/messaging/telegram/ |
-| 🤖 @BotFather (Create Bots) | https://t.me/BotFather |
-| 🆔 @userinfobot (Get User ID) | https://t.me/userinfobot |
-| 💬 Python Telegram Bot Library | https://github.com/python-telegram-bot/python-telegram-bot |
-| 🏠 Hermes Agent GitHub | https://github.com/NousResearch/hermes-agent |
-
----
-
-## ✅ Checklist
-
-Use this to track your progress:
-
-- [ ] **Step 1:** Bot created via @BotFather, token saved securely
-- [ ] **Step 2:** (Optional) Description, avatar, and command menu configured
-- [ ] **Step 3:** Telegram User ID obtained via @userinfobot
-- [ ] **Step 4:** Token and User ID added to `~/.hermes/.env`
-- [ ] **Step 5:** `python-telegram-bot` installed
-- [ ] **Step 6:** Gateway running (foreground or as a service)
-- [ ] **Step 7:** Bot responds in Telegram chat
-- [ ] **Step 8:** (Optional) Bot added to group with proper permissions
-
----
-
-## 📄 License
-
-MIT — feel free to use, share, and adapt this guide.
-
----
-
-> [!NOTE]
-> Built with [Hermes Agent](https://hermes-agent.nousresearch.com/) by Nous Research.
-> This guide was created on 2026-06-10 for Hermes Agent v0.16.0.
-> Always check the [official documentation](https://hermes-agent.nousresearch.com/docs/) for the latest information.
+> [!success] 🚀 Готово!
+> Теперь у тебя есть полноценный Telegram-бот, подключённый к Hermes Agent. Ты можешь общаться с AI-агентом откуда угодно — с телефона, планшета, другого компьютера. Все возможности (код, исследования, анализ, ответы на вопросы) доступны через Telegram!
